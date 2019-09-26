@@ -14,7 +14,6 @@ services:
    - ./zbx_env/var/lib/zabbix/mibs:/var/lib/zabbix/mibs:ro
    - ./zbx_env/var/lib/zabbix/snmptraps:/var/lib/zabbix/snmptraps:ro
   links:
-   - mysql-server:mysql-server
    - zabbix-java-gateway:zabbix-java-gateway
   ulimits:
    nproc: 65535
@@ -34,7 +33,6 @@ services:
    - .env_srv
   user: root
   depends_on:
-   - mysql-server
    - zabbix-java-gateway
    - zabbix-snmptraps
   networks:
@@ -144,7 +142,6 @@ services:
    - .env_prx_mysql
   user: root
   depends_on:
-   - mysql-server
    - zabbix-java-gateway
    - zabbix-snmptraps
   networks:
@@ -168,7 +165,6 @@ services:
    - "80:80"
    - "443:443"
   links:
-   - mysql-server:mysql-server
    - zabbix-server:zabbix-server
   volumes:
    - /etc/localtime:/etc/localtime:ro
@@ -186,7 +182,6 @@ services:
    - .env_web
   user: root
   depends_on:
-   - mysql-server
    - zabbix-server
   healthcheck:
    test: ["CMD", "curl", "-f", "http://localhost"]
@@ -218,7 +213,6 @@ services:
    - "8081:80"
    - "8443:443"
   links:
-   - mysql-server:mysql-server
    - zabbix-server:zabbix-server
   volumes:
    - /etc/localtime:/etc/localtime:ro
@@ -236,7 +230,6 @@ services:
    - .env_web
   user: root
   depends_on:
-   - mysql-server
    - zabbix-server
   healthcheck:
    test: ["CMD", "curl", "-f", "http://localhost"]
@@ -354,27 +347,6 @@ services:
    com.zabbix.company: "Zabbix SIA"
    com.zabbix.component: "snmptraps"
    com.zabbix.os: "ubuntu"
-
- mysql-server:
-  image: mysql:5.7
-  command: [mysqld, --character-set-server=utf8, --collation-server=utf8_bin]
-  volumes:
-   - ./zbx_env/var/lib/mysql:/var/lib/mysql:rw
-  env_file:
-   - .env_db_mysql
-  user: root
-  stop_grace_period: 1m
-  networks:
-   zbx_net_backend:
-    aliases:
-     - mysql-server
-     - zabbix-database
-     - mysql-database
-
- db_data_mysql:
-  image: busybox
-  volumes:
-   - ./zbx_env/var/lib/mysql:/var/lib/mysql:rw
 
 # elasticsearch:
 #  image: elasticsearch
